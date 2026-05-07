@@ -10,9 +10,6 @@
 ---
 
 ## Overview
-
-This document was inspired initially by Paul Roetzer, Founder & CEO, Marketing AI Institute, in his blog [Responsible AI Manifesto for Marketing and Business (v1)](https://www.marketingaiinstitute.com/blog/responsible-ai-manifesto-for-marketing-and-business). Like Paul and the SmarterX organization before us, we invite you to use these principles under a [Creative Commons Attribution-ShareAlike](https://creativecommons.org/licenses/by-sa/4.0/) license as a starting point for your own responsible AI policies and practices. This Creative Commons license lets others remix, adapt, and build upon the work, even for commercial purposes, as long as they credit the source and license their new creations under the identical terms.
-
 AI marks a fundamental shift in how humans interact both with technology and with one another. As with all major technological advancements before it, AI has the capability of spreading hope and good news of the Gospel to ever-widening groups of people. 
 
 Beginning with the construction of the first major roads during the Roman Empire, technology has enabled the message of the Gospel to go out to all the world bearing fruit and changing lives. Like the Gutenberg Press, AI will allow for unprecedented access and proliferation of the Bible by:
