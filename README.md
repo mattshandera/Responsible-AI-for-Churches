@@ -1,5 +1,5 @@
 # Responsible AI Principles for Churches
-**Version 2.0 | May 7, 2026**
+**Version 1.0 | May 7, 2026**
 
 ## Change Summary
 
