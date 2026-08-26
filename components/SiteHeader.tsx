@@ -12,23 +12,31 @@ export default function SiteHeader({ cta = true }: { cta?: boolean }) {
             document builder
           </span>
         </Link>
-        {cta ? (
+        <nav className="flex items-center gap-4">
           <Link
-            href="/build"
-            className="rounded-lg bg-brand px-4 py-1.5 text-sm font-semibold text-white transition hover:opacity-90"
-          >
-            Start
-          </Link>
-        ) : (
-          <a
-            href="https://github.com/mattshandera/Responsible-AI-for-Churches"
-            target="_blank"
-            rel="noreferrer noopener"
+            href="/about"
             className="text-sm font-medium text-muted transition hover:text-brand"
           >
-            Source
-          </a>
-        )}
+            About
+          </Link>
+          {cta ? (
+            <Link
+              href="/build"
+              className="rounded-lg bg-brand px-4 py-1.5 text-sm font-semibold text-white transition hover:opacity-90"
+            >
+              Start
+            </Link>
+          ) : (
+            <a
+              href="https://github.com/mattshandera/Responsible-AI-for-Churches"
+              target="_blank"
+              rel="noreferrer noopener"
+              className="text-sm font-medium text-muted transition hover:text-brand"
+            >
+              Source
+            </a>
+          )}
+        </nav>
       </div>
     </header>
   );
