@@ -35,6 +35,20 @@ The app lives at the repository root, so Vercel needs no configuration.
 There are no environment variables to set. Both routes are statically
 prerendered, so the whole thing runs on Vercel's free tier.
 
+### If the build fails with "No Output Directory named public"
+
+The Vercel project's **Framework Preset** is set to `Other` rather than
+`Next.js`. That preset expects a static site in `public/`; a Next.js app builds
+to `.next` and has no `public/` directory. Adding one would only produce an
+empty static deployment.
+
+This happens when a project was imported while the repository still had no
+`package.json` — Vercel detects the framework once, at import. `vercel.json`
+pins `"framework": "nextjs"` so a fresh deployment corrects itself, and
+`vercel.json` takes precedence over the dashboard. If the dashboard also has an
+explicit **Output Directory** override typed in, clear it: Project Settings →
+Build & Deployment → Output Directory → remove the value, then redeploy.
+
 To deploy from the CLI instead:
 
 ```bash
