@@ -143,6 +143,10 @@ export default function Home() {
       <footer className="border-t border-line py-8">
         <div className="mx-auto max-w-7xl px-4 text-xs text-muted lg:px-8">
           Released under CC BY-SA 4.0 ·{" "}
+          <Link className="hover:text-brand" href="/about">
+            About
+          </Link>{" "}
+          ·{" "}
           <a className="hover:text-brand" href={SOURCE_URL}>
             Source on GitHub
           </a>
