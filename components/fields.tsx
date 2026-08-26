@@ -107,7 +107,7 @@ export function RadioCards<T extends string>({
           return (
             <label
               key={opt.id}
-              className={`flex cursor-pointer gap-2.5 rounded-lg border p-3 transition ${
+              className={`flex min-h-11 cursor-pointer items-start gap-3 rounded-lg border p-3 transition ${
                 active
                   ? "border-brand bg-brand-soft"
                   : "border-line bg-surface hover:border-muted/50"
@@ -116,7 +116,7 @@ export function RadioCards<T extends string>({
               <input
                 type="radio"
                 name={name}
-                className="mt-0.5 h-4 w-4 shrink-0 accent-[color:var(--color-brand)]"
+                className="mt-px h-5 w-5 shrink-0 accent-[color:var(--color-brand)]"
                 checked={active}
                 onChange={() => onChange(opt.id)}
               />
@@ -125,7 +125,7 @@ export function RadioCards<T extends string>({
                   {opt.label}
                 </span>
                 {opt.blurb ? (
-                  <span className="mt-0.5 block text-xs leading-relaxed text-muted">
+                  <span className="mt-0.5 block text-[13px] leading-relaxed text-muted lg:text-xs">
                     {opt.blurb}
                   </span>
                 ) : null}
@@ -157,17 +157,17 @@ export function CheckRow({
         checked ? "border-brand/60 bg-brand-soft/60" : "border-line bg-surface"
       }`}
     >
-      <label className="flex cursor-pointer gap-2.5">
+      <label className="flex min-h-11 cursor-pointer items-start gap-3">
         <input
           type="checkbox"
-          className="mt-0.5 h-4 w-4 shrink-0 accent-[color:var(--color-brand)]"
+          className="mt-px h-5 w-5 shrink-0 accent-[color:var(--color-brand)]"
           checked={checked}
           onChange={(e) => onChange(e.target.checked)}
         />
         <span className="min-w-0">
           <span className="block text-sm font-medium text-ink">{label}</span>
           {detail ? (
-            <span className="mt-0.5 block text-xs leading-relaxed text-muted">
+            <span className="mt-0.5 block text-[13px] leading-relaxed text-muted lg:text-xs">
               {detail}
             </span>
           ) : null}
@@ -190,17 +190,17 @@ export function Toggle({
   onChange: (v: boolean) => void;
 }) {
   return (
-    <label className="flex cursor-pointer items-start gap-2.5 rounded-lg border border-line bg-surface p-3">
+    <label className="flex min-h-11 cursor-pointer items-start gap-3 rounded-lg border border-line bg-surface p-3">
       <input
         type="checkbox"
-        className="mt-0.5 h-4 w-4 shrink-0 accent-[color:var(--color-brand)]"
+        className="mt-px h-5 w-5 shrink-0 accent-[color:var(--color-brand)]"
         checked={checked}
         onChange={(e) => onChange(e.target.checked)}
       />
       <span>
         <span className="block text-sm font-medium text-ink">{label}</span>
         {hint ? (
-          <span className="mt-0.5 block text-xs leading-relaxed text-muted">
+          <span className="mt-0.5 block text-[13px] leading-relaxed text-muted lg:text-xs">
             {hint}
           </span>
         ) : null}

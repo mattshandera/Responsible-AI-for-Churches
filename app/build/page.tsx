@@ -9,7 +9,10 @@ export const metadata: Metadata = {
 export default function BuildPage() {
   return (
     <>
-      <SiteHeader cta={false} />
+      {/* The mobile step bar carries navigation on small screens. */}
+      <div className="hidden lg:block">
+        <SiteHeader cta={false} />
+      </div>
       <Builder />
     </>
   );
