@@ -2,6 +2,9 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Preview from "./Preview";
+import MobileActionBar from "./MobileActionBar";
+import MobileStepBar from "./MobileStepBar";
+import PreviewSheet, { type SheetState } from "./PreviewSheet";
 import {
   CheckRow,
   ListEditor,
@@ -54,7 +57,8 @@ export default function Builder() {
   const [answers, setAnswers] = useState<Answers>(initialAnswers);
   const [step, setStep] = useState(0);
   const [editing, setEditing] = useState<string | null>(null);
-  const [showPreview, setShowPreview] = useState(false);
+  const [sheet, setSheet] = useState<SheetState>("closed");
+  const [nameError, setNameError] = useState(false);
   const [copied, setCopied] = useState(false);
   const [busy, setBusy] = useState(false);
   const [loaded, setLoaded] = useState(false);
@@ -95,6 +99,23 @@ export default function Builder() {
   const markdown = useMemo(() => renderMarkdown(blocks), [blocks]);
   const principleCount = resolvedPrinciples(answers).length;
   const canAdvance = step !== 0 || answers.orgName.trim().length > 0;
+
+  function goBack() {
+    setStep((s) => Math.max(0, s - 1));
+  }
+
+  function goNext() {
+    // A disabled Next sits in a fixed bar on mobile, far from the field that
+    // explains it. Let it be tappable and say what is missing instead.
+    if (step === 0 && !canAdvance) {
+      setNameError(true);
+      const field = document.getElementById("org-name");
+      field?.scrollIntoView({ behavior: "smooth", block: "center" });
+      field?.focus({ preventScroll: true });
+      return;
+    }
+    setStep((s) => Math.min(STEPS.length - 1, s + 1));
+  }
 
   function download(blob: Blob, filename: string) {
     const url = URL.createObjectURL(blob);
@@ -154,12 +175,25 @@ export default function Builder() {
   }
 
   return (
-    <div className="mx-auto grid max-w-7xl gap-6 px-4 py-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] lg:px-8">
+    <div className="mx-auto grid max-w-7xl gap-6 px-4 pb-28 pt-0 lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] lg:px-8 lg:pb-8 lg:pt-8">
       <div className="min-w-0">
-        <StepNav step={step} onSelect={setStep} />
+        <MobileStepBar
+          steps={STEPS}
+          step={step}
+          onSelect={setStep}
+          canJump={answers.orgName.trim().length > 0}
+        />
 
-        <div className="mt-5 rounded-2xl border border-line bg-surface p-5 shadow-sm sm:p-7">
-          <header className="mb-5 border-b border-line pb-4">
+        <div className="hidden lg:block">
+          <StepNav step={step} onSelect={setStep} />
+        </div>
+
+        <p className="px-1 pb-1 pt-4 text-[13px] leading-[18px] text-muted lg:hidden">
+          {STEPS[step].blurb}
+        </p>
+
+        <div className="rounded-2xl border border-line bg-surface p-4 shadow-sm sm:p-7 lg:mt-5 lg:p-5">
+          <header className="mb-5 hidden border-b border-line pb-4 lg:block">
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand">
               Step {step + 1} of {STEPS.length}
             </p>
@@ -173,11 +207,16 @@ export default function Builder() {
             {step === 0 ? (
               <>
                 <TextField
+                  id="org-name"
                   label="Name of your church or organization"
                   hint="This appears throughout the document."
                   value={answers.orgName}
-                  onChange={(v) => set("orgName", v)}
+                  onChange={(v) => {
+                    if (v.trim()) setNameError(false);
+                    set("orgName", v);
+                  }}
                   placeholder="Grace Community Church"
+                  error={nameError ? "Add a name to continue." : undefined}
                 />
                 <RadioCards<OrgKind>
                   legend="What kind of organization is this?"
@@ -200,11 +239,6 @@ export default function Builder() {
                     placeholder="gracecommunity.org"
                   />
                 </div>
-                {!canAdvance ? (
-                  <p className="text-xs text-accent">
-                    Add a name to continue.
-                  </p>
-                ) : null}
               </>
             ) : null}
 
@@ -594,6 +628,53 @@ export default function Builder() {
 
             {step === 6 ? (
               <>
+                <div className="rounded-xl border border-line bg-surface p-4">
+                  <p className="mb-3 text-sm font-semibold text-ink">
+                    Take it with you
+                  </p>
+                  {/* PDF leads: on a phone it is the shareable artifact,
+                      while the Markdown is for someone heading to a repo. */}
+                  <div className="flex flex-col gap-2 sm:flex-row">
+                    <button
+                      type="button"
+                      onClick={downloadPdf}
+                      disabled={busy}
+                      className="flex h-12 items-center justify-center gap-2 rounded-[10px] bg-brand px-4 text-[15px] font-semibold text-white transition hover:opacity-90 disabled:opacity-50 sm:h-10 sm:text-sm"
+                    >
+                      <DownloadIcon />
+                      {busy ? "Building PDF…" : "Download PDF"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={downloadMarkdown}
+                      className="flex h-12 items-center justify-center gap-2 rounded-[10px] border border-line bg-surface px-4 text-[15px] font-semibold text-ink transition hover:border-brand hover:text-brand sm:h-10 sm:text-sm"
+                    >
+                      <DownloadIcon />
+                      Download Markdown
+                    </button>
+                  </div>
+                  <div className="mt-2 flex justify-center gap-6 sm:justify-start">
+                    <button
+                      type="button"
+                      onClick={copyMarkdown}
+                      className="flex h-10 items-center text-[13.5px] font-medium text-brand transition hover:underline"
+                    >
+                      {copied ? "Copied" : "Copy Markdown"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={startOver}
+                      className="flex h-10 items-center text-[13.5px] font-medium text-muted transition hover:text-red-600"
+                    >
+                      Start over
+                    </button>
+                  </div>
+                  <p className="mt-3 text-xs text-muted">
+                    Both files are generated in your browser. Your answers are
+                    saved on this device only and are never sent anywhere.
+                  </p>
+                </div>
+
                 <TextArea
                   label="A note about your adaptation (optional)"
                   hint="Appears in the attribution section. Some churches note what they changed and why."
@@ -616,47 +697,6 @@ export default function Builder() {
                   </p>
                 </div>
 
-                <div className="rounded-xl border border-line bg-surface p-4">
-                  <p className="mb-3 text-sm font-semibold text-ink">
-                    Take it with you
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    <button
-                      type="button"
-                      onClick={downloadMarkdown}
-                      className="rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white transition hover:opacity-90"
-                    >
-                      Download .md
-                    </button>
-                    <button
-                      type="button"
-                      onClick={downloadPdf}
-                      disabled={busy}
-                      className="rounded-lg bg-ink px-4 py-2 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-50"
-                    >
-                      {busy ? "Building PDF…" : "Download .pdf"}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={copyMarkdown}
-                      className="rounded-lg border border-line px-4 py-2 text-sm font-semibold text-ink transition hover:border-brand hover:text-brand"
-                    >
-                      {copied ? "Copied" : "Copy Markdown"}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={startOver}
-                      className="rounded-lg px-4 py-2 text-sm font-medium text-muted transition hover:text-red-600"
-                    >
-                      Start over
-                    </button>
-                  </div>
-                  <p className="mt-3 text-xs text-muted">
-                    Both files are generated in your browser. Your answers are
-                    saved on this device only and are never sent anywhere.
-                  </p>
-                </div>
-
                 <details className="rounded-xl border border-line bg-surface p-4">
                   <summary className="cursor-pointer text-sm font-semibold text-ink">
                     View the raw Markdown
@@ -669,10 +709,10 @@ export default function Builder() {
             ) : null}
           </div>
 
-          <div className="mt-7 flex items-center justify-between border-t border-line pt-4">
+          <div className="mt-7 hidden items-center justify-between border-t border-line pt-4 lg:flex">
             <button
               type="button"
-              onClick={() => setStep((s) => Math.max(0, s - 1))}
+              onClick={goBack}
               disabled={step === 0}
               className="rounded-lg border border-line px-4 py-2 text-sm font-medium text-ink transition hover:border-muted disabled:opacity-40"
             >
@@ -683,8 +723,8 @@ export default function Builder() {
             </p>
             <button
               type="button"
-              onClick={() => setStep((s) => Math.min(STEPS.length - 1, s + 1))}
-              disabled={step === STEPS.length - 1 || !canAdvance}
+              onClick={goNext}
+              disabled={step === STEPS.length - 1}
               className="rounded-lg bg-brand px-5 py-2 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-40"
             >
               {step === STEPS.length - 2 ? "Review" : "Next"}
@@ -693,30 +733,52 @@ export default function Builder() {
         </div>
       </div>
 
-      <aside className="lg:sticky lg:top-6 lg:h-[calc(100vh-3rem)] lg:self-start">
+      <aside className="hidden lg:sticky lg:top-6 lg:block lg:h-[calc(100vh-3rem)] lg:self-start">
         <div className="flex h-full flex-col rounded-2xl border border-line bg-surface shadow-sm">
           <div className="flex items-center justify-between border-b border-line px-4 py-3">
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted">
               Live preview
             </p>
-            <button
-              type="button"
-              className="text-xs font-medium text-brand lg:hidden"
-              onClick={() => setShowPreview((v) => !v)}
-            >
-              {showPreview ? "Hide" : "Show"}
-            </button>
           </div>
-          <div
-            className={`${
-              showPreview ? "block" : "hidden"
-            } flex-1 overflow-auto px-5 py-5 text-[0.92rem] lg:block`}
-          >
+          <div className="flex-1 overflow-auto px-5 py-5 text-[0.92rem]">
             <Preview blocks={blocks} />
           </div>
         </div>
       </aside>
+
+      <PreviewSheet
+        state={sheet}
+        onChange={setSheet}
+        blocks={blocks}
+      />
+
+      <MobileActionBar
+        step={step}
+        lastStep={STEPS.length - 1}
+        previewOpen={sheet !== "closed"}
+        onBack={goBack}
+        onNext={goNext}
+        onPreview={() => setSheet(sheet === "closed" ? "peek" : "closed")}
+      />
     </div>
+  );
+}
+
+function DownloadIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className="h-[18px] w-[18px]"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+      <path d="m7 10 5 5 5-5" />
+      <path d="M12 15V3" />
+    </svg>
   );
 }
 

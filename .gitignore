@@ -1,7 +1,9 @@
 node_modules/
 .next/
-out/
-build/
+# Anchored to the repo root: an unanchored "build/" would also ignore the
+# app/build/ route directory.
+/out/
+/build/
 .vercel
 .env*.local
 *.tsbuildinfo
