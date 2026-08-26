@@ -58,6 +58,7 @@ export default function Builder() {
   const [step, setStep] = useState(0);
   const [editing, setEditing] = useState<string | null>(null);
   const [sheet, setSheet] = useState<SheetState>("closed");
+  const [nameError, setNameError] = useState(false);
   const [copied, setCopied] = useState(false);
   const [busy, setBusy] = useState(false);
   const [loaded, setLoaded] = useState(false);
@@ -104,6 +105,15 @@ export default function Builder() {
   }
 
   function goNext() {
+    // A disabled Next sits in a fixed bar on mobile, far from the field that
+    // explains it. Let it be tappable and say what is missing instead.
+    if (step === 0 && !canAdvance) {
+      setNameError(true);
+      const field = document.getElementById("org-name");
+      field?.scrollIntoView({ behavior: "smooth", block: "center" });
+      field?.focus({ preventScroll: true });
+      return;
+    }
     setStep((s) => Math.min(STEPS.length - 1, s + 1));
   }
 
@@ -197,11 +207,16 @@ export default function Builder() {
             {step === 0 ? (
               <>
                 <TextField
+                  id="org-name"
                   label="Name of your church or organization"
                   hint="This appears throughout the document."
                   value={answers.orgName}
-                  onChange={(v) => set("orgName", v)}
+                  onChange={(v) => {
+                    if (v.trim()) setNameError(false);
+                    set("orgName", v);
+                  }}
                   placeholder="Grace Community Church"
+                  error={nameError ? "Add a name to continue." : undefined}
                 />
                 <RadioCards<OrgKind>
                   legend="What kind of organization is this?"
@@ -224,11 +239,6 @@ export default function Builder() {
                     placeholder="gracecommunity.org"
                   />
                 </div>
-                {!canAdvance ? (
-                  <p className="text-xs text-accent">
-                    Add a name to continue.
-                  </p>
-                ) : null}
               </>
             ) : null}
 
@@ -714,7 +724,7 @@ export default function Builder() {
             <button
               type="button"
               onClick={goNext}
-              disabled={step === STEPS.length - 1 || !canAdvance}
+              disabled={step === STEPS.length - 1}
               className="rounded-lg bg-brand px-5 py-2 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-40"
             >
               {step === STEPS.length - 2 ? "Review" : "Next"}
@@ -745,7 +755,6 @@ export default function Builder() {
       <MobileActionBar
         step={step}
         lastStep={STEPS.length - 1}
-        canAdvance={canAdvance}
         previewOpen={sheet !== "closed"}
         onBack={goBack}
         onNext={goNext}

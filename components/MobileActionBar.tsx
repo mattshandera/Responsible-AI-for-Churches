@@ -8,7 +8,6 @@
 export default function MobileActionBar({
   step,
   lastStep,
-  canAdvance,
   previewOpen,
   onBack,
   onNext,
@@ -16,7 +15,6 @@ export default function MobileActionBar({
 }: {
   step: number;
   lastStep: number;
-  canAdvance: boolean;
   previewOpen: boolean;
   onBack: () => void;
   onNext: () => void;
@@ -76,8 +74,7 @@ export default function MobileActionBar({
         <button
           type="button"
           onClick={onNext}
-          disabled={!canAdvance}
-          className="h-[46px] rounded-[10px] bg-brand px-5 text-sm font-semibold text-white disabled:opacity-40"
+          className="h-[46px] rounded-[10px] bg-brand px-5 text-sm font-semibold text-white transition active:opacity-80"
         >
           Next
         </button>

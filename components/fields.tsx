@@ -30,6 +30,8 @@ export function TextField({
   onChange,
   placeholder,
   type = "text",
+  id,
+  error,
 }: {
   label: string;
   hint?: string;
@@ -37,16 +39,32 @@ export function TextField({
   onChange: (v: string) => void;
   placeholder?: string;
   type?: string;
+  id?: string;
+  error?: string;
 }) {
   return (
     <Field label={label} hint={hint}>
       <input
+        id={id}
         type={type}
-        className={inputClass}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={error && id ? `${id}-error` : undefined}
+        className={`${inputClass} ${
+          error ? "border-accent focus:border-accent focus:ring-accent/15" : ""
+        }`}
         value={value}
         placeholder={placeholder}
         onChange={(e) => onChange(e.target.value)}
       />
+      {error ? (
+        <span
+          id={id ? `${id}-error` : undefined}
+          role="alert"
+          className="mt-1.5 block text-xs font-medium text-accent"
+        >
+          {error}
+        </span>
+      ) : null}
     </Field>
   );
 }
