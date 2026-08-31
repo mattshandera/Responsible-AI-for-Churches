@@ -32,7 +32,7 @@ export default function Home() {
               Start the questions
             </Link>
             <a
-              href={SOURCE_URL}
+              href={`${SOURCE_URL}#responsible-ai-principles-for-churches`}
               target="_blank"
               rel="noreferrer noopener"
               className="rounded-xl border border-line bg-surface px-7 py-3 text-base font-semibold text-ink transition hover:border-brand hover:text-brand"
