@@ -145,7 +145,11 @@ export default function Home() {
           Released under CC BY-SA 4.0 ·{" "}
           <a className="hover:text-brand" href={SOURCE_URL}>
             Source on GitHub
-          </a>
+          </a>{" "}
+          ·{" "}
+          <Link className="hover:text-brand" href="/about">
+            About
+          </Link>
         </div>
       </footer>
     </>
