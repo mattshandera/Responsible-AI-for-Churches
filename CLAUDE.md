@@ -33,7 +33,9 @@ end-to-end check this repo has.
 app/
   page.tsx           Landing page
   build/page.tsx      The wizard route
-  layout.tsx           Root layout; loads the GA4 tag via next/script
+  layout.tsx           Root layout; site-wide metadata + the GA4 tag
+  sitemap.ts / robots.ts        Generated /sitemap.xml and /robots.txt
+  opengraph-image.tsx / twitter-image.tsx   The share card, drawn by next/og
 components/
   Builder.tsx           Wizard state, the seven steps, download handlers
   Preview.tsx            Live HTML preview of the generated document
@@ -48,6 +50,10 @@ lib/
   markdown.ts                Block model -> Markdown
   pdf.ts                      Block model -> PDF (jsPDF, imported on demand)
   inline.ts                    The shared `**bold**` / `[link](url)` parser
+  site.ts                       Canonical URL + the SEO copy that hangs off it
+  structured-data.ts             Schema.org JSON-LD for the two routes
+  og.tsx                          The share card's layout (next/og)
+components/JsonLd.tsx        Renders a Schema.org graph into the page
 ```
 
 **Both output formats render from the same block model in `lib/document.ts`**,
@@ -79,6 +85,39 @@ initial bundle.
 - **Where the data goes.** Answers never leave the browser. A church's
   draft AI policy — including the parts about its own congregant data —
   should not be sitting on someone else's server.
+
+## Metadata and discoverability
+
+The site is meant to be found by people searching things like "build an AI
+policy for churches", so the metadata is load-bearing rather than
+decorative.
+
+- **One source for the domain.** `lib/site.ts` resolves `SITE_URL` from
+  `NEXT_PUBLIC_SITE_URL`, falling back to Vercel's own
+  `VERCEL_PROJECT_PRODUCTION_URL`, then to localhost. Canonicals, Open
+  Graph URLs, the sitemap, robots.txt, and the JSON-LD `@id`s all derive
+  from it, so a custom domain is a one-variable change. Set
+  `NEXT_PUBLIC_SITE_URL` in Vercel as soon as a real domain exists —
+  everything else follows.
+- **Titles and descriptions** live in each route's `metadata` export, with
+  the site-wide defaults and the `%s · Responsible AI for Churches`
+  template in `app/layout.tsx`. The home page uses `title.absolute` so the
+  search phrase sits at the front of the tab title rather than after the
+  site name.
+- **Structured data** is in `lib/structured-data.ts`. Every claim in it has
+  to stay visible on the page that ships it — that is Google's rule, and
+  the reason the `HowTo` steps quote the landing page's own three-step
+  section verbatim. `FAQPage` is deliberately absent: Google stopped
+  showing FAQ rich results outside government and health sites in 2023.
+- **The share card** (`lib/og.tsx`) is drawn at build time by `next/og`, so
+  there is no image asset to keep in sync with the copy. Satori supports
+  only a subset of CSS — flexbox only, and any element with more than one
+  child needs an explicit `display: "flex"`.
+- **Search Console** can be verified without touching DNS by setting
+  `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` in Vercel.
+
+`npm run build` prerenders `/sitemap.xml`, `/robots.txt`, and both image
+routes, so a successful build is also a check that this all still emits.
 
 ## Deploying
 
