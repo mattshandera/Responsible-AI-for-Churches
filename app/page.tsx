@@ -1,11 +1,32 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+import JsonLd from "@/components/JsonLd";
 import SiteHeader from "@/components/SiteHeader";
 import { PRINCIPLES } from "@/lib/principles";
 import { LICENSE_URL, SOURCE_URL, UPSTREAM_URL } from "@/lib/document";
+import { homeStructuredData } from "@/lib/structured-data";
+
+export const metadata: Metadata = {
+  // `absolute` because the head term belongs at the front of the tab title,
+  // not after the site name the layout template would prepend.
+  title: {
+    absolute: "Build an AI Policy for Your Church | Free Template",
+  },
+  description:
+    "Answer seven questions and download a customized AI policy for your church or ministry — eighteen responsible AI principles, as Markdown or PDF. Free, open source, and private to your browser.",
+  alternates: { canonical: "/" },
+  openGraph: {
+    url: "/",
+    title: "Build an AI Policy for Your Church — Free Template",
+    description:
+      "A seven-step builder that turns your answers into a finished Responsible AI Principles document for your church. Markdown or PDF, free, and nothing leaves your browser.",
+  },
+};
 
 export default function Home() {
   return (
     <>
+      <JsonLd data={homeStructuredData()} />
       <SiteHeader />
 
       <main>
