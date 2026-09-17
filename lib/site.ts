@@ -2,27 +2,40 @@
  * Canonical site URL plus the SEO copy that hangs off it.
  *
  * Every absolute URL the site emits — canonicals, Open Graph, the sitemap,
- * robots.txt, JSON-LD — resolves from `SITE_URL`, so there is exactly one
- * place to change when the domain changes. It is resolved at build time in
- * this order:
+ * robots.txt, JSON-LD — resolves from `SITE_URL`.
  *
- *   1. `NEXT_PUBLIC_SITE_URL` — set this in Vercel once a custom domain exists.
- *   2. `VERCEL_PROJECT_PRODUCTION_URL` — Vercel sets this itself, so even an
- *      unconfigured deploy gets correct canonicals rather than localhost ones.
- *   3. localhost, for `npm run dev`.
+ * The domain is a constant here rather than an environment variable because
+ * it is a fact about this project, not about where the project happens to be
+ * running: it is not a secret, it changes roughly never, and it is the single
+ * most consequential string in the site's SEO. In version control it is
+ * visible and reviewable. Read from a deploy platform's settings it is
+ * neither, and a later change to the project's domain list could silently
+ * rewrite every canonical tag on the site.
  *
- * Note that (2) is the *production* domain on every deploy, including previews.
- * That is what we want: a preview deploy should point search engines at the
- * real page, not at itself.
+ * Both routes are statically prerendered, so these URLs are written into the
+ * HTML at build time, with no request to infer a host from. Something has to
+ * say what the site is called; this is that something.
  */
+/**
+ * The apex, not `www` — Vercel redirects `www` here, so this is the form
+ * visitors land on and the one the canonical tag has to name. The two
+ * disagreeing is a contradiction: a canonical pointing at a host that
+ * redirects back to the page doing the pointing.
+ */
+const PRODUCTION_URL = "https://responsibleai.church";
+
 function resolveSiteUrl(): string {
+  // Escape hatch for a staging domain, or a fork deployed somewhere else.
   const explicit = process.env.NEXT_PUBLIC_SITE_URL;
   if (explicit) return explicit.replace(/\/+$/, "");
 
-  const vercel = process.env.VERCEL_PROJECT_PRODUCTION_URL;
-  if (vercel) return `https://${vercel.replace(/\/+$/, "")}`;
+  // `next dev`, where localhost URLs make the share card and the sitemap
+  // inspectable against the copy being edited.
+  if (process.env.NODE_ENV === "development") return "http://localhost:3000";
 
-  return "http://localhost:3000";
+  // Everything else — production and preview deploys alike. A preview should
+  // point search engines at the real page rather than compete with it.
+  return PRODUCTION_URL;
 }
 
 export const SITE_URL = resolveSiteUrl();

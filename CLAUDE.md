@@ -99,13 +99,20 @@ The site is meant to be found by people searching things like "build an AI
 policy for churches", so the metadata is load-bearing rather than
 decorative.
 
-- **One source for the domain.** `lib/site.ts` resolves `SITE_URL` from
-  `NEXT_PUBLIC_SITE_URL`, falling back to Vercel's own
-  `VERCEL_PROJECT_PRODUCTION_URL`, then to localhost. Canonicals, Open
-  Graph URLs, the sitemap, robots.txt, and the JSON-LD `@id`s all derive
-  from it, so a custom domain is a one-variable change. Set
-  `NEXT_PUBLIC_SITE_URL` in Vercel as soon as a real domain exists —
-  everything else follows.
+- **One source for the domain.** `PRODUCTION_URL` in `lib/site.ts` is
+  `https://responsibleai.church`, and `SITE_URL` derives from it.
+  Canonicals, Open Graph URLs, the sitemap, robots.txt, and the JSON-LD
+  `@id`s all follow, so changing the domain is a one-line change there.
+  It is a constant rather than an environment variable on purpose: both
+  routes are statically prerendered, so these absolute URLs are baked
+  into the HTML at build time with no request to infer a host from, and
+  the domain is a reviewable fact about the project rather than deploy
+  configuration. `NEXT_PUBLIC_SITE_URL` still overrides it for a staging
+  domain or a fork, and `next dev` uses localhost.
+  **It must be the apex, not `www`.** Vercel redirects `www` to the apex,
+  so a canonical naming `www` points at a host that bounces straight back
+  — a contradiction Google has to resolve on the site's behalf. If the
+  redirect direction ever changes, this constant changes with it.
 - **Titles and descriptions** live in each route's `metadata` export, with
   the site-wide defaults and the `%s · Responsible AI for Churches`
   template in `app/layout.tsx`. The home page uses `title.absolute` so the
