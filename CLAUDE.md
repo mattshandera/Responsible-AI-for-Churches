@@ -18,7 +18,8 @@ npm install
 npm run dev        # http://localhost:3000
 npm run build       # production build
 npm run start       # serve the production build
-npm run lint         # next lint
+npm run lint         # eslint .
+npm run lint:fix     # eslint . --fix
 npm run typecheck    # tsc --noEmit
 ```
 
@@ -26,6 +27,12 @@ There is no test suite. Always run `npm run build` (or at least
 `typecheck` + `lint`) before considering a change done — the build also
 statically prerenders both routes, so it's the closest thing to an
 end-to-end check this repo has.
+
+Linting is flat-config ESLint driven from `eslint.config.mjs`, not the
+deprecated `next lint` wrapper, which Next 16 removes. `next build` runs
+the same config, so a green build already covers lint. ESLint is held at
+9.x on purpose — `eslint-config-next@15` declares no peer support for
+ESLint 10.
 
 ## Architecture
 
