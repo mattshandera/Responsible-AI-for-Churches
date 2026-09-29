@@ -5,6 +5,7 @@ import Preview from "./Preview";
 import MobileActionBar from "./MobileActionBar";
 import MobileStepBar from "./MobileStepBar";
 import PreviewSheet, { type SheetState } from "./PreviewSheet";
+import QualityCard, { ScoreChip } from "./QualityCard";
 import {
   CheckRow,
   ListEditor,
@@ -30,6 +31,7 @@ import {
   resolvedPrinciples,
 } from "@/lib/document";
 import { renderMarkdown } from "@/lib/markdown";
+import { scoreAnswers } from "@/lib/quality";
 import { DEFAULT_ANSWERS, type Answers, type OrgKind, type ReviewCadence, type Tone } from "@/lib/types";
 
 const STORAGE_KEY = "raifc-builder-v1";
@@ -63,7 +65,8 @@ export default function Builder() {
   const [busy, setBusy] = useState(false);
   const [loaded, setLoaded] = useState(false);
 
-  // Restore any work in progress. Nothing leaves the browser.
+  // Restore any work in progress. Answers stay in the browser unless the
+  // user asks for the optional AI review.
   useEffect(() => {
     try {
       const raw = window.localStorage.getItem(STORAGE_KEY);
@@ -97,6 +100,10 @@ export default function Builder() {
 
   const blocks = useMemo(() => buildDocument(answers), [answers]);
   const markdown = useMemo(() => renderMarkdown(blocks), [blocks]);
+  const quality = useMemo(() => scoreAnswers(answers), [answers]);
+  // The AI review never sees who wrote the policy, only what it says.
+  const getRedactedMarkdown = () =>
+    renderMarkdown(buildDocument({ ...answers, ownerName: "", ownerEmail: "" }));
   const principleCount = resolvedPrinciples(answers).length;
   const canAdvance = step !== 0 || answers.orgName.trim().length > 0;
 
@@ -628,6 +635,12 @@ export default function Builder() {
 
             {step === 6 ? (
               <>
+                <QualityCard
+                  quality={quality}
+                  getRedactedMarkdown={getRedactedMarkdown}
+                  onJump={setStep}
+                />
+
                 <div className="rounded-xl border border-line bg-surface p-4">
                   <p className="mb-3 text-sm font-semibold text-ink">
                     Take it with you
@@ -671,7 +684,8 @@ export default function Builder() {
                   </div>
                   <p className="mt-3 text-xs text-muted">
                     Both files are generated in your browser. Your answers are
-                    saved on this device only and are never sent anywhere.
+                    saved on this device only. The one exception is the
+                    optional AI review above, which only runs if you ask for it.
                   </p>
                 </div>
 
@@ -739,6 +753,7 @@ export default function Builder() {
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted">
               Live preview
             </p>
+            <ScoreChip quality={quality} />
           </div>
           <div className="flex-1 overflow-auto px-5 py-5 text-[0.92rem]">
             <Preview blocks={blocks} />

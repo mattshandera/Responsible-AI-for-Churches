@@ -7,8 +7,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 A Next.js (App Router) single-page tool: a seven-step wizard that walks a
 church through questions and generates a customized "Responsible AI
 Principles" document, downloadable as Markdown or PDF. Everything runs
-client-side — no server, no database, no API, no analytics beyond a GA4
-tag. Answers persist only in the browser's `localStorage`
+client-side — no database, no analytics beyond a GA4 tag, and one
+opt-in server route (`app/api/grade`, see "Quality score" below). Answers persist only in the browser's `localStorage`
 (`raifc-builder-v1`).
 
 ## Commands
@@ -89,9 +89,35 @@ initial bundle.
 - **Attribution.** The source is CC BY-SA 4.0, so every generated
   document carries the attribution and ShareAlike notice — a license
   obligation, not a preference (`attributionBlocks` in `document.ts`).
-- **Where the data goes.** Answers never leave the browser. A church's
+- **Where the data goes.** Answers leave the browser only when the user
+  clicks "Get an AI review" (see "Quality score"). Never add anything that
+  sends them automatically, on load, or on download. A church's
   draft AI policy — including the parts about its own congregant data —
   should not be sitting on someone else's server.
+
+## Quality score
+
+A builder-only aid; it is never written into the Markdown or PDF.
+
+- **`lib/quality.ts`** is a deterministic, client-side checklist over
+  `Answers`: completeness checks plus coherence checks (answers that
+  contradict each other). Each check has a weight, a wizard step to jump to,
+  and a one-line fix. A check that does not apply counts as passed. Tiers are
+  "Getting started" (<50), "Solid foundation" (50-79), "Well-developed" (80+).
+  To add or retune a check, edit the `checks` array; nothing else changes.
+- **`components/QualityCard.tsx`** renders the score on the Review step, and
+  `ScoreChip` sits in the preview header.
+- **`app/api/grade/route.ts`** is the opt-in LLM grader and the only server
+  code in the app. The browser sends the document with the owner's name and
+  email blanked; the route also strips email addresses, caps size, rate
+  limits per IP (best effort), forces structured output through a tool call,
+  and treats the document as untrusted data. It stores and logs nothing.
+  It needs `ANTHROPIC_API_KEY` in Vercel; without it the route returns 503
+  and the card shows an error while the checklist keeps working.
+  `GRADER_MODEL` overrides the default model.
+- The consent wording on the button, the Review step footnote, the landing
+  page, the meta descriptions, and `lib/structured-data.ts` all say the same
+  thing. Change them together.
 
 ## Metadata and discoverability
 

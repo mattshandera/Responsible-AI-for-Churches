@@ -13,13 +13,13 @@ export const metadata: Metadata = {
     absolute: "Build an AI Policy for Your Church | Free Template",
   },
   description:
-    "Answer seven questions and download a customized AI policy for your church or ministry — eighteen responsible AI principles, as Markdown or PDF. Free, open source, and private to your browser.",
+    "Answer seven questions and download a customized AI policy for your church or ministry — eighteen responsible AI principles, as Markdown or PDF. Free, open source, and private by default.",
   alternates: { canonical: "/" },
   openGraph: {
     url: "/",
     title: "Build an AI Policy for Your Church — Free Template",
     description:
-      "A seven-step builder that turns your answers into a finished Responsible AI Principles document for your church. Markdown or PDF, free, and nothing leaves your browser.",
+      "A seven-step builder that turns your answers into a finished Responsible AI Principles document for your church. Markdown or PDF, free, and private by default.",
   },
 };
 
@@ -62,7 +62,7 @@ export default function Home() {
             </a>
           </div>
           <p className="mt-4 text-xs text-muted">
-            Nothing is uploaded. Everything runs in your browser.
+            Everything runs in your browser. The only thing that is ever sent anywhere is the optional AI review, and only if you ask for it.
           </p>
         </section>
 
