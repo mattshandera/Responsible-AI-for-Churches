@@ -110,11 +110,21 @@ declare global {
 
 /**
  * Count a completed share with GA4's recommended `share` event. It records
- * what kind of thing was shared and how, never the content.
+ * what kind of thing was shared, how, and from which button (`item_id`),
+ * never the content.
  */
-export function trackShare(kind: ShareKind, outcome: ShareOutcome) {
+export function trackShare(kind: ShareKind, outcome: ShareOutcome, placement?: string) {
   if (outcome === "cancelled" || outcome === "failed") return;
   const method =
     outcome === "shared" ? "native" : outcome === "copied" ? "copy_link" : "download";
-  window.gtag?.("event", "share", { method, content_type: kind });
+  window.gtag?.("event", "share", { method, content_type: kind, item_id: placement });
+}
+
+/**
+ * Count each time the "pass it on" dialog is shown. Builder shares with
+ * `item_id: "dialog"` divided by this is the dialog's conversion rate: the
+ * number that says whether interrupting people is worth it.
+ */
+export function trackSharePrompt() {
+  window.gtag?.("event", "share_prompt_shown");
 }

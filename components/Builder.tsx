@@ -6,7 +6,7 @@ import MobileActionBar from "./MobileActionBar";
 import MobileStepBar from "./MobileStepBar";
 import PreviewSheet, { type SheetState } from "./PreviewSheet";
 import QualityCard, { ScoreChip } from "./QualityCard";
-import ShareBuilderCard, { ShareIcon } from "./ShareBuilderCard";
+import ShareBuilderCard, { ShareBuilderDialog, ShareIcon } from "./ShareBuilderCard";
 import {
   CheckRow,
   ListEditor,
@@ -33,7 +33,13 @@ import {
 } from "@/lib/document";
 import { renderMarkdown } from "@/lib/markdown";
 import { scoreAnswers } from "@/lib/quality";
-import { canShareFiles, downloadBlob, share, trackShare } from "@/lib/share";
+import {
+  canShareFiles,
+  downloadBlob,
+  share,
+  trackShare,
+  trackSharePrompt,
+} from "@/lib/share";
 import { SITE_URL } from "@/lib/site";
 import { DEFAULT_ANSWERS, type Answers, type OrgKind, type ReviewCadence, type Tone } from "@/lib/types";
 
@@ -41,6 +47,9 @@ const STORAGE_KEY = "raifc-builder-v1";
 // Set once a policy has been downloaded or shared, so the "pass it on" card
 // is still there when someone comes back to their draft.
 const GENERATED_KEY = "raifc-generated-v1";
+// Set once the "pass it on" dialog has been shown. It interrupts exactly
+// once per browser; after that the card on the Review step carries the ask.
+const PROMPTED_KEY = "raifc-share-prompted-v1";
 
 const STEPS = [
   { id: "org", title: "Your church", blurb: "Who this document is for." },
@@ -73,6 +82,7 @@ export default function Builder() {
   const [fileShare, setFileShare] = useState(false);
   const [generated, setGenerated] = useState(false);
   const [shareNote, setShareNote] = useState<string | null>(null);
+  const [promptOpen, setPromptOpen] = useState(false);
   const pdfModule = useRef<typeof import("@/lib/pdf") | null>(null);
 
   // Restore any work in progress. Nothing leaves the browser.
@@ -153,6 +163,36 @@ export default function Builder() {
     } catch {
       /* storage may be unavailable */
     }
+    promptOnce();
+  }
+
+  // Ask once, and only after the person is back on the page. A download on
+  // a phone opens the PDF viewer, and a share has just closed the share
+  // sheet; a dialog racing either one is noise.
+  function promptOnce() {
+    try {
+      if (window.localStorage.getItem(PROMPTED_KEY)) return;
+      window.localStorage.setItem(PROMPTED_KEY, "1");
+    } catch {
+      // Without storage there is no remembering it was shown, and a dialog
+      // on every download is worse than none. The card still shows.
+      return;
+    }
+    const show = () =>
+      window.setTimeout(() => {
+        setPromptOpen(true);
+        trackSharePrompt();
+      }, 700);
+    if (document.visibilityState === "visible") {
+      show();
+      return;
+    }
+    const onVisible = () => {
+      if (document.visibilityState !== "visible") return;
+      document.removeEventListener("visibilitychange", onVisible);
+      show();
+    };
+    document.addEventListener("visibilitychange", onVisible);
   }
 
   async function loadPdf() {
@@ -832,6 +872,8 @@ export default function Builder() {
         onChange={setSheet}
         blocks={blocks}
       />
+
+      <ShareBuilderDialog open={promptOpen} onClose={() => setPromptOpen(false)} />
 
       <MobileActionBar
         step={step}
