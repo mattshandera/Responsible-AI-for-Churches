@@ -58,6 +58,7 @@ components/
   PreviewSheet.tsx        Mobile bottom-sheet version of the preview
   MobileActionBar.tsx / MobileStepBar.tsx   Mobile-only navigation chrome
   fields.tsx              Shared form inputs (TextField, RadioCards, etc.)
+  ShareBuilderCard.tsx     "Pass it on" card: shares a link to the builder
 lib/
   principles.ts          The 18 principles + a practice clause per posture
   options.ts              Use cases, automations, prohibited uses, tones, cadences
@@ -66,6 +67,7 @@ lib/
   markdown.ts                Block model -> Markdown
   pdf.ts                      Block model -> PDF (jsPDF, imported on demand)
   inline.ts                    The shared `**bold**` / `[link](url)` parser
+  share.ts                     Web Share API wrapper with download/copy fallbacks
   site.ts                       Canonical URL + the SEO copy that hangs off it
   structured-data.ts             Schema.org JSON-LD for the two routes
   og.tsx                          The share card's layout (next/og)
@@ -117,6 +119,26 @@ A builder-only aid; it is never written into the Markdown or PDF.
 - An opt-in LLM grader (a server route plus a "Get an AI review" button) was
   built and deliberately left out, because it breaks the "answers never leave
   the browser" promise. It lives on the `claude/ai-review-grader` branch.
+
+## Sharing
+
+Both kinds of sharing go through `share()` in `lib/share.ts`: the finished
+PDF ("Share PDF" on the Review step) and a link to the builder itself
+(`ShareBuilderCard`, shown once a policy has been downloaded, shared, or
+copied; remembered in `localStorage` under `raifc-generated-v1`).
+
+- It uses the Web Share API, so the OS share sheet does the work. Where that
+  is missing (desktop Firefox, Chrome on Linux), a file is downloaded and a
+  link is copied instead. "Share PDF" only renders where the browser can
+  share files, since its fallback would just be "Download PDF" again.
+- **`share()` must run inside the click.** Browsers open the share sheet only
+  during a click's user activation, and Safari loses it across an `await`.
+  That is why `Builder.tsx` loads `lib/pdf.ts` when the Review step mounts
+  and renders the PDF synchronously on click. Don't add an `await` before
+  the `share()` call.
+- Completed shares fire GA4's recommended `share` event with `method` and
+  `content_type` (`policy` / `builder`), never the content.
+- The builder link shares a URL, not answers. Keep it that way.
 
 ## Metadata and discoverability
 

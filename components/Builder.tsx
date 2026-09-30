@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Preview from "./Preview";
 import MobileActionBar from "./MobileActionBar";
 import MobileStepBar from "./MobileStepBar";
 import PreviewSheet, { type SheetState } from "./PreviewSheet";
 import QualityCard, { ScoreChip } from "./QualityCard";
+import ShareBuilderCard, { ShareIcon } from "./ShareBuilderCard";
 import {
   CheckRow,
   ListEditor,
@@ -32,9 +33,14 @@ import {
 } from "@/lib/document";
 import { renderMarkdown } from "@/lib/markdown";
 import { scoreAnswers } from "@/lib/quality";
+import { canShareFiles, downloadBlob, share, trackShare } from "@/lib/share";
+import { SITE_URL } from "@/lib/site";
 import { DEFAULT_ANSWERS, type Answers, type OrgKind, type ReviewCadence, type Tone } from "@/lib/types";
 
 const STORAGE_KEY = "raifc-builder-v1";
+// Set once a policy has been downloaded or shared, so the "pass it on" card
+// is still there when someone comes back to their draft.
+const GENERATED_KEY = "raifc-generated-v1";
 
 const STEPS = [
   { id: "org", title: "Your church", blurb: "Who this document is for." },
@@ -64,15 +70,21 @@ export default function Builder() {
   const [copied, setCopied] = useState(false);
   const [busy, setBusy] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const [fileShare, setFileShare] = useState(false);
+  const [generated, setGenerated] = useState(false);
+  const [shareNote, setShareNote] = useState<string | null>(null);
+  const pdfModule = useRef<typeof import("@/lib/pdf") | null>(null);
 
   // Restore any work in progress. Nothing leaves the browser.
   useEffect(() => {
     try {
       const raw = window.localStorage.getItem(STORAGE_KEY);
       if (raw) setAnswers({ ...initialAnswers(), ...JSON.parse(raw) });
+      setGenerated(window.localStorage.getItem(GENERATED_KEY) === "1");
     } catch {
       /* ignore unreadable storage */
     }
+    setFileShare(canShareFiles());
     setLoaded(true);
   }, []);
 
@@ -84,6 +96,20 @@ export default function Builder() {
       /* storage may be unavailable or full */
     }
   }, [answers, loaded]);
+
+  // Load the PDF renderer on arrival at the last step rather than on click.
+  // Sharing has to open the share sheet inside the click that asked for it,
+  // and Safari will not wait for a chunk to download first.
+  useEffect(() => {
+    if (step !== STEPS.length - 1 || pdfModule.current) return;
+    import("@/lib/pdf")
+      .then((m) => {
+        pdfModule.current = m;
+      })
+      .catch(() => {
+        /* retried on click */
+      });
+  }, [step]);
 
   const set = <K extends keyof Answers>(key: K, value: Answers[K]) =>
     setAnswers((prev) => ({ ...prev, [key]: value }));
@@ -120,39 +146,68 @@ export default function Builder() {
     setStep((s) => Math.min(STEPS.length - 1, s + 1));
   }
 
-  function download(blob: Blob, filename: string) {
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
+  function markGenerated() {
+    setGenerated(true);
+    try {
+      window.localStorage.setItem(GENERATED_KEY, "1");
+    } catch {
+      /* storage may be unavailable */
+    }
   }
 
+  async function loadPdf() {
+    pdfModule.current ??= await import("@/lib/pdf");
+    return pdfModule.current;
+  }
+
+  const version = answers.version.trim() || "1.0";
+  const pdfName = `${fileBaseName(answers)}.pdf`;
+  const pdfFooter = `${docTitle(answers)} · v${version}`;
+
   function downloadMarkdown() {
-    download(
+    downloadBlob(
       new Blob([markdown], { type: "text/markdown;charset=utf-8" }),
       `${fileBaseName(answers)}.md`,
     );
+    markGenerated();
   }
 
   async function downloadPdf() {
     setBusy(true);
     try {
-      const { renderPdf } = await import("@/lib/pdf");
-      const footer = `${docTitle(answers)} · v${answers.version.trim() || "1.0"}`;
-      renderPdf(blocks, footer).save(`${fileBaseName(answers)}.pdf`);
+      const { renderPdf } = await loadPdf();
+      renderPdf(blocks, pdfFooter).save(pdfName);
+      markGenerated();
     } finally {
       setBusy(false);
     }
+  }
+
+  async function sharePdf() {
+    setShareNote(null);
+    // Normally already loaded by the effect above. If it is not, this await
+    // may cost Safari the click, and share() falls back to a download.
+    const { renderPdf } = pdfModule.current ?? (await loadPdf());
+    const file = new File([renderPdf(blocks, pdfFooter).output("blob")], pdfName, {
+      type: "application/pdf",
+    });
+    const outcome = await share({
+      title: docTitle(answers),
+      text: `${docTitle(answers)}, version ${version}.\n\nBuilt with ${new URL(SITE_URL).host}`,
+      file,
+    });
+    trackShare("policy", outcome);
+    if (outcome === "downloaded") {
+      setShareNote("This browser can't hand files to other apps, so the PDF was downloaded instead. Attach it from your downloads.");
+    }
+    if (outcome === "shared" || outcome === "downloaded") markGenerated();
   }
 
   async function copyMarkdown() {
     try {
       await navigator.clipboard.writeText(markdown);
       setCopied(true);
+      markGenerated();
       window.setTimeout(() => setCopied(false), 2000);
     } catch {
       /* clipboard blocked; the download still works */
@@ -638,13 +693,25 @@ export default function Builder() {
                     Take it with you
                   </p>
                   {/* PDF leads: on a phone it is the shareable artifact,
-                      while the Markdown is for someone heading to a repo. */}
-                  <div className="flex flex-col gap-2 sm:flex-row">
+                      while the Markdown is for someone heading to a repo.
+                      Where the device can hand a file to its share sheet,
+                      sharing leads, since that is usually where it's going. */}
+                  <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+                    {fileShare ? (
+                      <button
+                        type="button"
+                        onClick={sharePdf}
+                        className={PRIMARY_BUTTON}
+                      >
+                        <ShareIcon />
+                        Share PDF
+                      </button>
+                    ) : null}
                     <button
                       type="button"
                       onClick={downloadPdf}
                       disabled={busy}
-                      className="flex h-12 items-center justify-center gap-2 rounded-[10px] bg-brand px-4 text-[15px] font-semibold text-white transition hover:opacity-90 disabled:opacity-50 sm:h-10 sm:text-sm"
+                      className={fileShare ? SECONDARY_BUTTON : PRIMARY_BUTTON}
                     >
                       <DownloadIcon />
                       {busy ? "Building PDF…" : "Download PDF"}
@@ -652,12 +719,17 @@ export default function Builder() {
                     <button
                       type="button"
                       onClick={downloadMarkdown}
-                      className="flex h-12 items-center justify-center gap-2 rounded-[10px] border border-line bg-surface px-4 text-[15px] font-semibold text-ink transition hover:border-brand hover:text-brand sm:h-10 sm:text-sm"
+                      className={SECONDARY_BUTTON}
                     >
                       <DownloadIcon />
                       Download Markdown
                     </button>
                   </div>
+                  {shareNote ? (
+                    <p className="mt-2 text-xs text-ink-soft" role="status">
+                      {shareNote}
+                    </p>
+                  ) : null}
                   <div className="mt-2 flex justify-center gap-6 sm:justify-start">
                     <button
                       type="button"
@@ -675,10 +747,13 @@ export default function Builder() {
                     </button>
                   </div>
                   <p className="mt-3 text-xs text-muted">
-                    Both files are generated in your browser. Your answers are
-                    saved on this device only and are never sent anywhere.
+                    Files are generated in your browser. Your answers are saved
+                    on this device only, and your document goes only where you
+                    send it.
                   </p>
                 </div>
+
+                {generated ? <ShareBuilderCard /> : null}
 
                 <TextArea
                   label="A note about your adaptation (optional)"
@@ -769,6 +844,11 @@ export default function Builder() {
     </div>
   );
 }
+
+const PRIMARY_BUTTON =
+  "flex h-12 items-center justify-center gap-2 rounded-[10px] bg-brand px-4 text-[15px] font-semibold text-white transition hover:opacity-90 disabled:opacity-50 sm:h-10 sm:text-sm";
+const SECONDARY_BUTTON =
+  "flex h-12 items-center justify-center gap-2 rounded-[10px] border border-line bg-surface px-4 text-[15px] font-semibold text-ink transition hover:border-brand hover:text-brand disabled:opacity-50 sm:h-10 sm:text-sm";
 
 function DownloadIcon() {
   return (
