@@ -95,11 +95,7 @@ new section means adding blocks in one place.
   carries the attribution and ShareAlike notice. This is a license obligation,
   not a preference.
 - **Where the data goes.** Answers are kept in `localStorage` under
-  `raifc-builder-v1` and nowhere else, with one exception: the optional
-  "Get an AI review" button sends the drafted document (owner name and email
-  removed) to `app/api/grade`, which forwards it to the Anthropic API. It
-  needs `ANTHROPIC_API_KEY` set in Vercel and does nothing unless the user
-  clicks. A church's draft AI policy — including
+  `raifc-builder-v1` and nowhere else. A church's draft AI policy — including
   the parts about its own congregant data — should not be sitting on someone
   else's server.
 

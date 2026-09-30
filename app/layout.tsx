@@ -33,13 +33,13 @@ export const metadata: Metadata = {
     url: "/",
     title: "Build an AI Policy for Your Church — Free Template",
     description:
-      "A seven-step builder that turns your answers into a finished Responsible AI Principles document for your church. Markdown or PDF, free, and private by default.",
+      "A seven-step builder that turns your answers into a finished Responsible AI Principles document for your church. Markdown or PDF, free, and nothing leaves your browser.",
   },
   twitter: {
     card: "summary_large_image",
     title: "Build an AI Policy for Your Church — Free Template",
     description:
-      "Seven questions in, a finished Responsible AI Principles document out. Markdown or PDF, free, and private by default.",
+      "Seven questions in, a finished Responsible AI Principles document out. Markdown or PDF, free, and nothing leaves your browser.",
   },
   robots: {
     index: true,

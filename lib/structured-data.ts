@@ -78,7 +78,7 @@ export function homeStructuredData() {
           `${PRINCIPLES.length} responsible AI principles, each optional and editable`,
           "Three postures — cautious, balanced, or pioneering — that change what each principle commits you to do",
           "Markdown and PDF download",
-          "Runs in the browser; answers are only sent anywhere if you request the optional AI review",
+          "Runs entirely in the browser; answers are never uploaded",
           "CC BY-SA 4.0, with attribution written into every document",
         ],
       },

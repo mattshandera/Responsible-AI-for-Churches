@@ -1,16 +1,10 @@
 # Security Policy
 
-This is a client-side Next.js app. Per [`BUILDER.md`](./BUILDER.md),
-there is no database, and everything is generated in the browser and stored
-only in that browser's `localStorage`. The one exception is the optional
-"Get an AI review" button, which sends the drafted document to a single
-server route (`app/api/grade`) that forwards it to the Anthropic API and
-stores nothing. That significantly limits the attack surface, but a few
-things are still worth reporting:
-
-- Abuse or bypass of the `app/api/grade` route (rate limiting, size limits,
-  prompt injection that changes the shape of its response, or any way to
-  read the server's API key)
+This is a static, client-side Next.js app. Per [`BUILDER.md`](./BUILDER.md),
+there is no backend, no database, no API, and no server that ever sees a
+user's answers — everything is generated in the browser and stored only in
+that browser's `localStorage`. That significantly limits the attack
+surface, but a few things are still worth reporting:
 
 - A vulnerability in a dependency (`npm audit` finding with a real
   exploit path in this app)
