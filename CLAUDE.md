@@ -34,6 +34,15 @@ the same config, so a green build already covers lint. ESLint is held at
 9.x on purpose — `eslint-config-next@15` declares no peer support for
 ESLint 10.
 
+## Getting changes to `main`
+
+Changes reach `main` through a pull request, never a direct push. When asked
+to "push to main" or "ship" something, push the feature branch, open a PR
+(mirroring `.github/pull_request_template.md` if the repo has one), and merge
+it once checks are green. That request counts as approval for both the PR and
+the merge, as long as there are no unresolved merge conflicts. If there are
+conflicts or a failing check, stop and report instead of forcing it through.
+
 ## Architecture
 
 ```
