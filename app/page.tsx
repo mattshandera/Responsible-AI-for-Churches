@@ -2,9 +2,18 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import HeroWord from "@/components/HeroWord";
 import JsonLd from "@/components/JsonLd";
+import Preview from "@/components/Preview";
+import { ScoreChip } from "@/components/QualityCard";
 import SiteHeader from "@/components/SiteHeader";
 import { PRINCIPLES } from "@/lib/principles";
-import { LICENSE_URL, SOURCE_URL, UPSTREAM_URL } from "@/lib/document";
+import {
+  buildDocument,
+  LICENSE_URL,
+  SOURCE_URL,
+  UPSTREAM_URL,
+} from "@/lib/document";
+import { scoreAnswers } from "@/lib/quality";
+import { SAMPLE_ANSWERS } from "@/lib/sample";
 import { HOW_IT_WORKS } from "@/lib/site";
 import { homeStructuredData } from "@/lib/structured-data";
 
@@ -89,6 +98,48 @@ export default function Home() {
             ministries · nonprofits · schools &amp; seminaries · faith-driven
             businesses
           </p>
+        </section>
+
+        {/* The real document, built by the same code as a real draft from
+            sample answers, so it shows what the builder makes today. */}
+        <section
+          aria-labelledby="sample-heading"
+          className="mx-auto max-w-4xl px-4 pb-16 lg:px-8"
+        >
+          <div className="overflow-hidden rounded-2xl border border-line bg-surface shadow-[0_1px_2px_rgba(24,24,27,0.04),0_24px_48px_-24px_rgba(24,24,27,0.16)]">
+            <div className="flex items-center justify-between gap-3 border-b border-line px-4 py-3 sm:px-5">
+              <h2
+                id="sample-heading"
+                className="whitespace-nowrap text-xs font-semibold uppercase tracking-[0.14em] text-muted"
+              >
+                Sample<span className="hidden sm:inline"> policy</span>
+              </h2>
+              <div className="whitespace-nowrap">
+                <ScoreChip quality={scoreAnswers(SAMPLE_ANSWERS)} />
+              </div>
+            </div>
+            {/* Visual only: screen readers get the caption below rather
+                than a second h1 and a document's worth of headings. */}
+            <div
+              aria-hidden="true"
+              inert
+              className="relative h-[34rem] overflow-hidden px-5 pt-6 text-[0.92rem] sm:h-[40rem] sm:px-10 sm:pt-8"
+            >
+              <Preview blocks={buildDocument(SAMPLE_ANSWERS)} />
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-surface via-surface/80 to-transparent" />
+            </div>
+            <div className="flex flex-col items-start gap-3 border-t border-line px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+              <p className="text-sm text-ink-soft">
+                Drafted for a sample church. Yours will say what you decide.
+              </p>
+              <Link
+                href="/build"
+                className="text-sm font-semibold text-brand underline underline-offset-4 transition hover:opacity-80"
+              >
+                Start yours
+              </Link>
+            </div>
+          </div>
         </section>
 
         <section className="border-y border-line bg-surface py-14">

@@ -13,6 +13,9 @@ import { useEffect, useState } from "react";
  * - It stops rather than loops, so it needs no pause control (WCAG 2.2.2).
  * - It is aria-hidden; the h1's aria-label carries the full sentence, so a
  *   screen reader never hears the swaps.
+ * - Its slot is always as wide as the final word (the widest), and each word
+ *   is centred in it. The line never changes width, so "Your" never moves:
+ *   it sits where it will end up from the first frame.
  */
 const WORDS = ["church", "ministry", "nonprofit", "business", "organization"];
 const LAST = WORDS.length - 1;
@@ -51,8 +54,7 @@ export default function HeroWord() {
     const timers: number[] = [];
     const later = (fn: () => void, ms: number) => timers.push(window.setTimeout(fn, ms));
 
-    // Fade and blur out, swap while invisible (so the re-centred line never
-    // visibly slides), then rise back in.
+    // Fade and blur out, swap while invisible, then rise back in.
     const step = (next: number) => {
       setPhase("out");
       later(() => {
@@ -82,9 +84,14 @@ export default function HeroWord() {
   const settled = index === LAST && phase === "in";
 
   return (
-    <span aria-hidden="true" className="relative isolate inline-block">
+    <span
+      aria-hidden="true"
+      className="relative isolate inline-grid justify-items-center font-serif font-semibold italic tracking-[-0.01em] text-brand"
+    >
+      {/* Invisible sizer: holds the slot at the final word's width. */}
+      <span className="invisible col-start-1 row-start-1">{WORDS[LAST]}</span>
       <span
-        className="inline-block font-serif font-semibold italic tracking-[-0.01em] text-brand"
+        className="col-start-1 row-start-1"
         style={{
           ...PHASE_STYLE[phase],
           transition: instant
