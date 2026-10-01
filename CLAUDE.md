@@ -133,7 +133,9 @@ The site is named for churches and built for any faith-driven organization
 
 - **The landing h1** says "Your church" in the server HTML, then
   `HeroWord` widens it (ministry, nonprofit, business) and settles on
-  "organization". It plays once per session, stops rather than loops (no
+  "organization". The word sits in a slot as wide as "organization",
+  centred, so the line never changes width and "Your" never moves. It
+  plays once per session, stops rather than loops (no
   pause control needed), and goes straight to the settled word with reduced
   motion. The h1's `aria-label` carries the full sentence, so screen readers
   and crawlers get "church, ministry, nonprofit, or business"; the moving
