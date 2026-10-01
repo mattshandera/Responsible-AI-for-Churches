@@ -8,6 +8,7 @@ export type OrgKind =
   | "denomination"
   | "ministry"
   | "school"
+  | "business"
   | "other";
 
 export type Answers = {

@@ -28,7 +28,7 @@ import {
   buildDocument,
   docTitle,
   fileBaseName,
-  orgLabel,
+  orgLabelStart,
   resolvedPrinciples,
 } from "@/lib/document";
 import { renderMarkdown } from "@/lib/markdown";
@@ -52,7 +52,7 @@ const GENERATED_KEY = "raifc-generated-v1";
 const PROMPTED_KEY = "raifc-share-prompted-v1";
 
 const STEPS = [
-  { id: "org", title: "Your church", blurb: "Who this document is for." },
+  { id: "org", title: "Your organization", blurb: "Who this document is for." },
   { id: "doc", title: "Document details", blurb: "Title, version, and owner." },
   { id: "posture", title: "Posture & voice", blurb: "How far you are willing to go, and how it should read." },
   { id: "principles", title: "Principles", blurb: "Keep, cut, reword, or add your own." },
@@ -602,7 +602,7 @@ export default function Builder() {
             {step === 4 ? (
               <>
                 <Toggle
-                  label={`${orgLabel(answers)} is using AI today`}
+                  label={`${orgLabelStart(answers)} is using AI today`}
                   hint="If you are not yet, the document says so plainly and leaves room to fill in later."
                   checked={answers.usesAiToday}
                   onChange={(v) => set("usesAiToday", v)}

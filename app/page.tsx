@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import HeroWord from "@/components/HeroWord";
 import JsonLd from "@/components/JsonLd";
 import SiteHeader from "@/components/SiteHeader";
 import { PRINCIPLES } from "@/lib/principles";
@@ -32,23 +33,41 @@ export default function Home() {
       <main>
         <section className="mx-auto max-w-4xl px-4 pb-14 pt-16 text-center lg:px-8">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand">
-            Free · Open source · CC BY-SA 4.0
+            Free · Open source · Private
+            <span className="hidden sm:inline"> to your browser</span>
           </p>
-          <h1 className="mt-4 text-4xl font-bold leading-tight tracking-tight text-ink sm:text-5xl">
-            Your church needs an AI policy.
-            <br />
-            Build one in ten minutes.
+          {/* The word after "Your" cycles from church out to organization
+              (HeroWord). The aria-label is what screen readers announce
+              instead, and it keeps "church" in the heading. */}
+          <h1
+            aria-label="Your church, ministry, nonprofit, or business needs an AI policy. Build one in ten minutes."
+            className="mt-4 text-[clamp(1.6rem,8.4vw,2.1rem)] font-extrabold leading-[1.1] tracking-[-0.03em] text-ink sm:text-5xl lg:text-[4rem] lg:leading-[1.06]"
+          >
+            <span aria-hidden="true" className="block">
+              Your <HeroWord />
+            </span>
+            <span aria-hidden="true" className="block">
+              needs an AI policy.
+            </span>
+            <span
+              aria-hidden="true"
+              className="mt-[0.2em] block text-[0.66em] leading-tight tracking-[-0.02em] text-ink-soft"
+            >
+              Build one in ten minutes.
+            </span>
           </h1>
-          <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-ink-soft">
-            Answer a short set of questions about your church, your posture, and
-            where you have already drawn lines. You will leave with a finished
+          <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-ink-soft">
+            Answer a short set of questions about your team, your posture, and
+            the lines you have already drawn. You will leave with a finished
             Responsible AI Principles document — as Markdown or PDF — that reads
-            like your church wrote it, because you did.
+            like you wrote it, because you did.
           </p>
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+          {/* One obvious next step. The original lives on GitHub, which is
+              a detour most visitors don't need, so it is a text link. */}
+          <div className="mt-8 flex flex-col items-center justify-center gap-2 sm:flex-row sm:gap-7">
             <Link
               href="/build"
-              className="rounded-xl bg-brand px-7 py-3 text-base font-semibold text-white shadow-sm transition hover:opacity-90"
+              className="flex h-[52px] w-full items-center justify-center rounded-xl bg-brand px-7 text-base font-semibold text-white shadow-sm transition hover:opacity-90 sm:w-auto"
             >
               Start the questions
             </Link>
@@ -56,13 +75,18 @@ export default function Home() {
               href={`${SOURCE_URL}#responsible-ai-principles-for-churches`}
               target="_blank"
               rel="noreferrer noopener"
-              className="rounded-xl border border-line bg-surface px-7 py-3 text-base font-semibold text-ink transition hover:border-brand hover:text-brand"
+              className="flex h-12 items-center text-[15px] font-semibold text-brand underline underline-offset-4 transition hover:opacity-80"
             >
-              Read the original
+              Read the original principles
             </a>
           </div>
-          <p className="mt-4 text-xs text-muted">
+          <p className="mt-3 text-xs text-muted">
             Nothing is uploaded. Everything runs in your browser.
+          </p>
+          <p className="mx-auto mt-9 max-w-2xl border-t border-line pt-5 text-sm leading-relaxed text-ink-soft text-balance sm:border-0 sm:pt-0">
+            <span className="font-semibold text-ink">Made for</span> churches ·
+            ministries · nonprofits · schools &amp; seminaries · faith-driven
+            businesses
           </p>
         </section>
 
