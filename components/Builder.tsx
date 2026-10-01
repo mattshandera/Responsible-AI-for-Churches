@@ -656,7 +656,7 @@ export default function Builder() {
                           label="Other automations"
                           items={answers.customAutomations}
                           onChange={(v) => set("customAutomations", v)}
-                          placeholder="Weekly attendance rollup to our elders."
+                          placeholder="Weekly attendance rollup to our leadership team."
                           addLabel="Add an automation"
                         />
                       </>
