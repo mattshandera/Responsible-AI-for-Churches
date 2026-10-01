@@ -34,8 +34,18 @@ function orgNoun(a: Answers): string {
   return ORG_KINDS.find((k) => k.id === a.orgKind)?.noun ?? "organization";
 }
 
+/**
+ * The organization's name, for use mid-sentence. With no name given it falls
+ * back to "our church", "our ministry", and so on, following the kind of
+ * organization chosen, and lowercase so it reads naturally after "at".
+ */
 export function orgLabel(a: Answers): string {
-  return a.orgName.trim() || "Our church";
+  return a.orgName.trim() || `our ${orgNoun(a)}`;
+}
+
+/** `orgLabel` for the start of a sentence, or a label standing on its own. */
+export function orgLabelStart(a: Answers): string {
+  return a.orgName.trim() || `Our ${orgNoun(a)}`;
 }
 
 export function docTitle(a: Answers): string {
@@ -204,7 +214,6 @@ function principleBlocks(a: Answers): Block[] {
 }
 
 function usageBlocks(a: Answers): Block[] {
-  const org = orgLabel(a);
   const blocks: Block[] = [{ type: "h2", text: "How We Use AI Today" }];
 
   const chosen = a.useCases
@@ -215,7 +224,7 @@ function usageBlocks(a: Answers): Block[] {
   if (!a.usesAiToday || (chosen.length === 0 && customUses.length === 0)) {
     blocks.push({
       type: "p",
-      text: `${org} is not yet making regular use of AI tools. We are publishing these principles first, so that our practice follows a decision we have already made rather than the other way around. This section will be filled in as our use begins.`,
+      text: `${orgLabelStart(a)} is not yet making regular use of AI tools. We are publishing these principles first, so that our practice follows a decision we have already made rather than the other way around. This section will be filled in as our use begins.`,
     });
     return blocks;
   }
@@ -375,7 +384,7 @@ function attributionBlocks(a: Answers): Block[] {
 /** Assemble the full document for a set of answers. */
 export function buildDocument(a: Answers): Block[] {
   const meta: { label: string; value: string }[] = [
-    { label: "Prepared for", value: orgLabel(a) },
+    { label: "Prepared for", value: orgLabelStart(a) },
   ];
   if (a.orgLocation.trim())
     meta.push({ label: "Location", value: a.orgLocation.trim() });

@@ -6,6 +6,7 @@ export const ORG_KINDS: { id: OrgKind; label: string; noun: string }[] = [
   { id: "denomination", label: "A denomination or network", noun: "network" },
   { id: "ministry", label: "A ministry or nonprofit", noun: "ministry" },
   { id: "school", label: "A Christian school or seminary", noun: "school" },
+  { id: "business", label: "A faith-driven business", noun: "business" },
   { id: "other", label: "Something else", noun: "organization" },
 ];
 

@@ -47,7 +47,7 @@ conflicts or a failing check, stop and report instead of forcing it through.
 
 ```
 app/
-  page.tsx           Landing page
+  page.tsx           Landing page (its h1 animates via components/HeroWord.tsx)
   build/page.tsx      The wizard route
   layout.tsx           Root layout; site-wide metadata + the GA4 tag
   sitemap.ts / robots.ts        Generated /sitemap.xml and /robots.txt
@@ -59,6 +59,7 @@ components/
   MobileActionBar.tsx / MobileStepBar.tsx   Mobile-only navigation chrome
   fields.tsx              Shared form inputs (TextField, RadioCards, etc.)
   ShareBuilderCard.tsx     "Pass it on" card: shares a link to the builder
+  HeroWord.tsx              The landing h1's cycling word (church … organization)
 lib/
   principles.ts          The 18 principles + a practice clause per posture
   options.ts              Use cases, automations, prohibited uses, tones, cadences
@@ -119,6 +120,26 @@ A builder-only aid; it is never written into the Markdown or PDF.
 - An opt-in LLM grader (a server route plus a "Get an AI review" button) was
   built and deliberately left out, because it breaks the "answers never leave
   the browser" promise. It lives on the `claude/ai-review-grader` branch.
+
+## Who it's for
+
+The site is named for churches and built for any faith-driven organization
+(ministries, nonprofits, schools, faith-driven businesses). Keep both true:
+
+- **The landing h1** says "Your church" in the server HTML, then
+  `HeroWord` widens it (ministry, nonprofit, business) and settles on
+  "organization". It plays once per session, stops rather than loops (no
+  pause control needed), and goes straight to the settled word with reduced
+  motion. The h1's `aria-label` carries the full sentence, so screen readers
+  and crawlers get "church, ministry, nonprofit, or business"; the moving
+  word is `aria-hidden`.
+- **Search copy stays church-first.** Titles, descriptions, the share card,
+  and the three-step section (which `structured-data.ts` quotes verbatim)
+  still say "church", since that is what people search for.
+- **In the generated document, never hardcode "church" for the reader's
+  organization.** Use `orgLabel(a)` mid-sentence and `orgLabelStart(a)` at
+  the start of a sentence; with no name typed they fall back to "our
+  church", "our ministry", "our business", and so on, from `ORG_KINDS`.
 
 ## Sharing
 
