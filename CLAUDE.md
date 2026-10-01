@@ -101,6 +101,9 @@ initial bundle.
 - **Attribution.** The source is CC BY-SA 4.0, so every generated
   document carries the attribution and ShareAlike notice — a license
   obligation, not a preference (`attributionBlocks` in `document.ts`).
+  The section closes with a line linking back to the builder at
+  `SITE_URL`, so anyone a policy is passed to can make their own. That
+  line is the product's own reach, not a license term.
 - **Where the data goes.** Answers never leave the browser. A church's
   draft AI policy — including the parts about its own congregant data —
   should not be sitting on someone else's server.
