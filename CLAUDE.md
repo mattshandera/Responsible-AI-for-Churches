@@ -54,7 +54,8 @@ app/
   opengraph-image.tsx / twitter-image.tsx   The share card, drawn by next/og
 components/
   Builder.tsx           Wizard state, the seven steps, download handlers
-  Preview.tsx            Live HTML preview of the generated document
+  Preview.tsx            Live HTML preview of the generated document (stateless;
+                         also rendered on the server for the landing page's sample)
   PreviewSheet.tsx        Mobile bottom-sheet version of the preview
   MobileActionBar.tsx / MobileStepBar.tsx   Mobile-only navigation chrome
   fields.tsx              Shared form inputs (TextField, RadioCards, etc.)
@@ -69,6 +70,7 @@ lib/
   pdf.ts                      Block model -> PDF (jsPDF, imported on demand)
   inline.ts                    The shared `**bold**` / `[link](url)` parser
   share.ts                     Web Share API wrapper with download/copy fallbacks
+  sample.ts                    The sample church the landing page previews
   site.ts                       Canonical URL + the SEO copy that hangs off it
   structured-data.ts             Schema.org JSON-LD for the two routes
   og.tsx                          The share card's layout (next/og)
@@ -136,6 +138,13 @@ The site is named for churches and built for any faith-driven organization
   motion. The h1's `aria-label` carries the full sentence, so screen readers
   and crawlers get "church, ministry, nonprofit, or business"; the moving
   word is `aria-hidden`.
+- **The landing page's sample policy** is the real `buildDocument` output
+  for `SAMPLE_ANSWERS` (Grace Community Church), rendered by the same
+  `Preview` component as the builder, with a real `ScoreChip`. It cannot
+  drift from the product, so keep it that way: no hand-built mock. Keep
+  `Preview` free of state and effects so the server can render it. The
+  sample leaves out location, website, and email so a fictional church
+  never reads as a real one.
 - **Search copy stays church-first.** Titles, descriptions, and the share
   card still say "church", since that is what people search for. Body copy
   on the page speaks to any organization: the three-step section says "your

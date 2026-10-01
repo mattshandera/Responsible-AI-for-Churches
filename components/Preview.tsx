@@ -1,5 +1,5 @@
-"use client";
-
+// No state or effects, so it renders anywhere: inside the builder, and on
+// the server for the landing page's sample.
 import { Fragment } from "react";
 import type { Block } from "@/lib/document";
 import { parseInline } from "@/lib/inline";
