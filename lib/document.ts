@@ -6,6 +6,7 @@ import {
   REVIEW_CADENCES,
   USE_CASES,
 } from "./options";
+import { SITE_URL } from "./site";
 import type { Answers } from "./types";
 
 export const SOURCE_URL =
@@ -377,6 +378,13 @@ function attributionBlocks(a: Answers): Block[] {
   blocks.push({
     type: "p",
     text: `Like the work it builds on, this document is released under the [Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)](${LICENSE_URL}) license. You are free to share and adapt it, including commercially, provided you give appropriate credit and license your version under the same terms.`,
+  });
+  // The last line of every copy points back to the builder. A policy gets
+  // passed to staff, boards, and other churches; whoever reads it should be
+  // one click from making their own.
+  blocks.push({
+    type: "p",
+    text: `Made with the free builder at [${new URL(SITE_URL).host}](${SITE_URL}), where any church, ministry, or organization can create its own.`,
   });
   return blocks;
 }
