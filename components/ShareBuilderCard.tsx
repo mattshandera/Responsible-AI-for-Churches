@@ -7,6 +7,11 @@ import { SITE_NAME, SITE_URL } from "@/lib/site";
 const MESSAGE =
   "I used this free tool to build an AI policy for our church. It takes about ten minutes, and nothing you type leaves your browser. Thought it might help your team too.";
 
+// Says "organizations" rather than "churches" so it reads as a fair fit
+// when the person passing it on is thinking of a nonprofit.
+const PITCH =
+  "Most organizations have staff using AI and no policy for it yet. If this helped, pass the builder to a pastor, ministry leader, or nonprofit director who could use it.";
+
 type Placement = "card" | "dialog";
 
 function useShareBuilder(placement: Placement) {
@@ -66,9 +71,7 @@ export default function ShareBuilderCard() {
         Know a church that needs one of these?
       </h3>
       <p className="mt-1 text-xs leading-relaxed text-ink-soft">
-        Most churches have staff using AI and no policy for it yet. If this
-        helped, pass the builder to a pastor, elder, or ministry leader who
-        could use it.
+        {PITCH}
       </p>
       <div className="mt-3">
         <ShareButton outcome={outcome} onClick={onShare} />
@@ -126,9 +129,7 @@ export function ShareBuilderDialog({
           Know a church that needs one of these?
         </h2>
         <p className="mt-2 text-sm leading-relaxed text-ink-soft">
-          Most churches have staff using AI and no policy for it yet. If this
-          helped, pass the builder to a pastor, elder, or ministry leader who
-          could use it.
+          {PITCH}
         </p>
         <div className="mt-5 flex flex-col gap-2 sm:flex-row-reverse sm:justify-start">
           <ShareButton outcome={outcome} onClick={shareAndClose} />
