@@ -66,6 +66,26 @@ export const SITE_KEYWORDS = [
   "church staff AI guidelines",
 ];
 
+/**
+ * The landing page's three-step "how it works" section. The page renders it
+ * and the `HowTo` JSON-LD quotes it, from this one list, because Google
+ * requires structured data to match what is visible on the page.
+ */
+export const HOW_IT_WORKS = [
+  {
+    title: "Answer the questions",
+    body: "Seven short steps: your organization, your posture toward AI, what you actually use it for, and where it will never go.",
+  },
+  {
+    title: "Watch it write itself",
+    body: "The document updates as you answer. Keep all eighteen principles, cut the ones that do not fit, reword any of them, or add your own.",
+  },
+  {
+    title: "Download and adopt",
+    body: "Take the Markdown into your docs or repo, or the PDF into your next staff or board meeting. Attribution and license are handled for you.",
+  },
+] as const;
+
 /** Absolute URL for a site-relative path. */
 export function absoluteUrl(path = "/"): string {
   return new URL(path, SITE_URL).toString();

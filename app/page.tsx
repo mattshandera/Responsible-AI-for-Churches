@@ -5,6 +5,7 @@ import JsonLd from "@/components/JsonLd";
 import SiteHeader from "@/components/SiteHeader";
 import { PRINCIPLES } from "@/lib/principles";
 import { LICENSE_URL, SOURCE_URL, UPSTREAM_URL } from "@/lib/document";
+import { HOW_IT_WORKS } from "@/lib/site";
 import { homeStructuredData } from "@/lib/structured-data";
 
 export const metadata: Metadata = {
@@ -93,25 +94,11 @@ export default function Home() {
         <section className="border-y border-line bg-surface py-14">
           <div className="mx-auto max-w-5xl px-4 lg:px-8">
             <div className="grid gap-8 sm:grid-cols-3">
-              {[
-                {
-                  step: "01",
-                  title: "Answer the questions",
-                  body: "Seven short steps: your church, your posture toward AI, what you actually use it for, and where it will never go.",
-                },
-                {
-                  step: "02",
-                  title: "Watch it write itself",
-                  body: "The document updates as you answer. Keep all eighteen principles, cut the ones that do not fit, reword any of them, or add your own.",
-                },
-                {
-                  step: "03",
-                  title: "Download and adopt",
-                  body: "Take the Markdown into your docs or repo, or the PDF into your next elders' meeting. Attribution and license are handled for you.",
-                },
-              ].map((c) => (
-                <div key={c.step}>
-                  <p className="text-sm font-bold text-brand">{c.step}</p>
+              {HOW_IT_WORKS.map((c, i) => (
+                <div key={c.title}>
+                  <p className="text-sm font-bold text-brand">
+                    {String(i + 1).padStart(2, "0")}
+                  </p>
                   <h2 className="mt-2 text-lg font-bold tracking-tight text-ink">
                     {c.title}
                   </h2>

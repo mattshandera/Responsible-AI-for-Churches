@@ -136,9 +136,10 @@ The site is named for churches and built for any faith-driven organization
   motion. The h1's `aria-label` carries the full sentence, so screen readers
   and crawlers get "church, ministry, nonprofit, or business"; the moving
   word is `aria-hidden`.
-- **Search copy stays church-first.** Titles, descriptions, the share card,
-  and the three-step section (which `structured-data.ts` quotes verbatim)
-  still say "church", since that is what people search for.
+- **Search copy stays church-first.** Titles, descriptions, and the share
+  card still say "church", since that is what people search for. Body copy
+  on the page speaks to any organization: the three-step section says "your
+  organization" and "your next staff or board meeting".
 - **In the generated document, never hardcode "church" for the reader's
   organization.** Use `orgLabel(a)` mid-sentence and `orgLabelStart(a)` at
   the start of a sentence; with no name typed they fall back to "our
@@ -199,8 +200,9 @@ decorative.
   site name.
 - **Structured data** is in `lib/structured-data.ts`. Every claim in it has
   to stay visible on the page that ships it — that is Google's rule, and
-  the reason the `HowTo` steps quote the landing page's own three-step
-  section verbatim. `FAQPage` is deliberately absent: Google stopped
+  the reason the `HowTo` steps and the landing page's three-step section
+  both render from one list, `HOW_IT_WORKS` in `lib/site.ts`. Edit the
+  steps there and both follow. `FAQPage` is deliberately absent: Google stopped
   showing FAQ rich results outside government and health sites in 2023.
 - **The share card** (`lib/og.tsx`) is drawn at build time by `next/og`, so
   there is no image asset to keep in sync with the copy. Satori supports

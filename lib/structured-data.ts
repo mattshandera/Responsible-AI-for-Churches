@@ -12,7 +12,13 @@
  */
 import { PRINCIPLES } from "@/lib/principles";
 import { LICENSE_URL, SOURCE_URL } from "@/lib/document";
-import { absoluteUrl, AUTHOR_NAME, REPO_URL, SITE_NAME } from "@/lib/site";
+import {
+  absoluteUrl,
+  AUTHOR_NAME,
+  HOW_IT_WORKS,
+  REPO_URL,
+  SITE_NAME,
+} from "@/lib/site";
 
 const APP_ID = absoluteUrl("/#webapp");
 const SITE_ID = absoluteUrl("/#website");
@@ -94,29 +100,14 @@ export function homeStructuredData() {
           value: "0",
         },
         tool: { "@id": APP_ID },
-        step: [
-          {
-            "@type": "HowToStep",
-            position: 1,
-            name: "Answer the questions",
-            text: "Seven short steps: your church, your posture toward AI, what you actually use it for, and where it will never go.",
-            url: absoluteUrl("/build"),
-          },
-          {
-            "@type": "HowToStep",
-            position: 2,
-            name: "Watch it write itself",
-            text: `The document updates as you answer. Keep all ${PRINCIPLES.length} principles, cut the ones that do not fit, reword any of them, or add your own.`,
-            url: absoluteUrl("/build"),
-          },
-          {
-            "@type": "HowToStep",
-            position: 3,
-            name: "Download and adopt",
-            text: "Take the Markdown into your docs or repo, or the PDF into your next elders' meeting. Attribution and license are handled for you.",
-            url: absoluteUrl("/build"),
-          },
-        ],
+        // The same list the landing page renders, so the two cannot drift.
+        step: HOW_IT_WORKS.map((s, i) => ({
+          "@type": "HowToStep",
+          position: i + 1,
+          name: s.title,
+          text: s.body,
+          url: absoluteUrl("/build"),
+        })),
       },
     ],
   };
