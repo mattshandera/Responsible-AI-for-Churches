@@ -4,12 +4,17 @@ export default function SiteHeader({ cta = true }: { cta?: boolean }) {
   return (
     <header className="border-b border-line bg-surface/80 backdrop-blur">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3.5 lg:px-8">
-        <Link href="/" className="group flex items-baseline gap-2">
+        {/* The name stays "for Churches"; the parenthetical says the
+            builder is just as much for any faith-driven organization. */}
+        <Link
+          href="/"
+          className="group flex min-w-0 flex-col sm:flex-row sm:items-baseline sm:gap-2"
+        >
           <span className="text-sm font-bold tracking-tight text-ink">
             Responsible AI for Churches
           </span>
-          <span className="hidden text-xs text-muted sm:inline">
-            document builder
+          <span className="text-xs italic text-muted">
+            (and other faith-driven organizations)
           </span>
         </Link>
         {cta ? (

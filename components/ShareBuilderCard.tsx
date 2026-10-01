@@ -5,10 +5,13 @@ import { share, trackShare, type ShareOutcome } from "@/lib/share";
 import { SITE_NAME, SITE_URL } from "@/lib/site";
 
 const MESSAGE =
-  "I used this free tool to build an AI policy for our church. It takes about ten minutes, and nothing you type leaves your browser. Thought it might help your team too.";
+  "I used this free tool to build an AI policy for our organization. It takes about ten minutes, and nothing you type leaves your browser. Thought it might help your team too.";
 
-// Says "organizations" rather than "churches" so it reads as a fair fit
-// when the person passing it on is thinking of a nonprofit.
+// Says "organization" rather than "church" throughout: the builder suits
+// any faith-driven organization (a church, a ministry, a nonprofit, a
+// business with a strong culture of faith), and the person passing it on
+// may be any of them, or thinking of any of them.
+const HEADING = "Know an organization that needs one of these?";
 const PITCH =
   "Most organizations have staff using AI and no policy for it yet. If this helped, pass the builder to a pastor, ministry leader, or nonprofit director who could use it.";
 
@@ -68,7 +71,7 @@ export default function ShareBuilderCard() {
       className="rounded-xl border border-brand/30 bg-brand-soft p-4"
     >
       <h3 id="pass-it-on" className="text-sm font-semibold text-ink">
-        Know a church that needs one of these?
+        {HEADING}
       </h3>
       <p className="mt-1 text-xs leading-relaxed text-ink-soft">
         {PITCH}
@@ -126,7 +129,7 @@ export function ShareBuilderDialog({
           Your policy is ready
         </p>
         <h2 id="share-dialog-title" className="mt-1 text-lg font-bold tracking-tight">
-          Know a church that needs one of these?
+          {HEADING}
         </h2>
         <p className="mt-2 text-sm leading-relaxed text-ink-soft">
           {PITCH}
