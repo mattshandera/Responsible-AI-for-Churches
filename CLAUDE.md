@@ -9,7 +9,7 @@ church through questions and generates a customized "Responsible AI
 Principles" document, downloadable as Markdown or PDF. Everything runs
 client-side — no server, no database, no API, no analytics beyond a GA4
 tag. Answers persist only in the browser's `localStorage`
-(`raifc-builder-v1`).
+(`raifc-builder-v1`, plus the wizard step in `raifc-builder-step-v1`).
 
 ## Commands
 
@@ -61,6 +61,7 @@ components/
   fields.tsx              Shared form inputs (TextField, RadioCards, etc.)
   ShareBuilderCard.tsx     "Pass it on" card: shares a link to the builder
   HeroWord.tsx              The landing h1's cycling word (church … organization)
+  StartLink.tsx             The landing CTA: "Start the questions", or "Continue your draft"
 lib/
   principles.ts          The 18 principles + a practice clause per posture
   options.ts              Use cases, automations, prohibited uses, tones, cadences
@@ -70,6 +71,8 @@ lib/
   pdf.ts                      Block model -> PDF (jsPDF, imported on demand)
   inline.ts                    The shared `**bold**` / `[link](url)` parser
   share.ts                     Web Share API wrapper with download/copy fallbacks
+  draft.ts                     The saved draft's storage keys, the seven STEPS, and a
+                               summary reader the landing page uses
   sample.ts                    The sample church the landing page previews
   site.ts                       Canonical URL + the SEO copy that hangs off it
   structured-data.ts             Schema.org JSON-LD for the two routes
@@ -109,6 +112,29 @@ initial bundle.
 - **Where the data goes.** Answers never leave the browser. A church's
   draft AI policy — including the parts about its own congregant data —
   should not be sitting on someone else's server.
+- **What may reach analytics (decided 2026-10-02).** The promise covers
+  what people *write*: their principles and wording, their limits, names,
+  emails, notes, and anything about their own people. That never leaves
+  the browser. A *category* they pick from a fixed list is different:
+  coarse, fixed-option answers such as the organization kind (church,
+  ministry, nonprofit, school, business) may be sent to GA4 as anonymous
+  counts, to learn who the tool is serving (see the business-voice plan,
+  issue #15). The line is: fixed options yes, anything typed into a text
+  field never. Prefer sending a category once, alongside a completed
+  download or share, over sending it on every click. Not built yet; when it
+  is, keep the on-page privacy copy literally true.
+
+### Saved drafts
+
+The builder writes every answer to `localStorage` as it changes, and the
+current step alongside it, so a refresh or a return visit picks up where
+the person left off, on that device only. `lib/draft.ts` owns the keys.
+The step is only restored once there is an organization name, since step
+1 won't advance without one. The landing page's main button
+(`StartLink`) becomes "Continue your draft", with the name and step, when
+a draft with a name exists. Browser storage is not permanent (Safari can
+clear it after 7 days without a visit, and private windows forget it on
+close), so the downloaded Markdown or PDF is the only durable copy.
 
 ## Quality score
 

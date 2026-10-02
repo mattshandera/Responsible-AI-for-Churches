@@ -3,6 +3,7 @@ import Link from "next/link";
 import HeroWord from "@/components/HeroWord";
 import JsonLd from "@/components/JsonLd";
 import Preview from "@/components/Preview";
+import StartLink, { DraftNote } from "@/components/StartLink";
 import { ScoreChip } from "@/components/QualityCard";
 import SiteHeader from "@/components/SiteHeader";
 import { PRINCIPLES } from "@/lib/principles";
@@ -75,12 +76,7 @@ export default function Home() {
           {/* One obvious next step. The original lives on GitHub, which is
               a detour most visitors don't need, so it is a text link. */}
           <div className="mt-8 flex flex-col items-center justify-center gap-2 sm:flex-row sm:gap-7">
-            <Link
-              href="/build"
-              className="flex h-[52px] w-full items-center justify-center rounded-xl bg-brand px-7 text-base font-semibold text-white shadow-sm transition hover:opacity-90 sm:w-auto"
-            >
-              Start the questions
-            </Link>
+            <StartLink className="flex h-[52px] w-full items-center justify-center rounded-xl bg-brand px-7 text-base font-semibold text-white shadow-sm transition hover:opacity-90 sm:w-auto" />
             <a
               href={`${SOURCE_URL}#responsible-ai-principles-for-churches`}
               target="_blank"
@@ -90,6 +86,7 @@ export default function Home() {
               Read the original principles
             </a>
           </div>
+          <DraftNote />
           <p className="mt-3 text-xs text-muted">
             Nothing is uploaded. Everything runs in your browser.
           </p>
