@@ -32,6 +32,7 @@ import {
   resolvedPrinciples,
 } from "@/lib/document";
 import { renderMarkdown } from "@/lib/markdown";
+import { DRAFT_KEY, savedStep, STEP_KEY, STEPS } from "@/lib/draft";
 import { scoreAnswers } from "@/lib/quality";
 import {
   canShareFiles,
@@ -43,23 +44,12 @@ import {
 import { SITE_URL } from "@/lib/site";
 import { DEFAULT_ANSWERS, type Answers, type OrgKind, type ReviewCadence, type Tone } from "@/lib/types";
 
-const STORAGE_KEY = "raifc-builder-v1";
 // Set once a policy has been downloaded or shared, so the "pass it on" card
 // is still there when someone comes back to their draft.
 const GENERATED_KEY = "raifc-generated-v1";
 // Set once the "pass it on" dialog has been shown. It interrupts exactly
 // once per browser; after that the card on the Review step carries the ask.
 const PROMPTED_KEY = "raifc-share-prompted-v1";
-
-const STEPS = [
-  { id: "org", title: "Your organization", blurb: "Who this document is for." },
-  { id: "doc", title: "Document details", blurb: "Title, version, and owner." },
-  { id: "posture", title: "Posture & voice", blurb: "How far you are willing to go, and how it should read." },
-  { id: "principles", title: "Principles", blurb: "Keep, cut, reword, or add your own." },
-  { id: "usage", title: "How you use AI", blurb: "What is actually happening today." },
-  { id: "guardrails", title: "Guardrails", blurb: "Where AI does not go, and who approves it." },
-  { id: "review", title: "Review & download", blurb: "Read it through, then take it with you." },
-] as const;
 
 function initialAnswers(): Answers {
   return {
@@ -88,8 +78,13 @@ export default function Builder() {
   // Restore any work in progress. Nothing leaves the browser.
   useEffect(() => {
     try {
-      const raw = window.localStorage.getItem(STORAGE_KEY);
-      if (raw) setAnswers({ ...initialAnswers(), ...JSON.parse(raw) });
+      const raw = window.localStorage.getItem(DRAFT_KEY);
+      if (raw) {
+        const restored: Answers = { ...initialAnswers(), ...JSON.parse(raw) };
+        setAnswers(restored);
+        // Pick up on the step they left, not back at step 1.
+        setStep(savedStep(restored.orgName, window.localStorage.getItem(STEP_KEY)));
+      }
       setGenerated(window.localStorage.getItem(GENERATED_KEY) === "1");
     } catch {
       /* ignore unreadable storage */
@@ -101,11 +96,20 @@ export default function Builder() {
   useEffect(() => {
     if (!loaded) return;
     try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(answers));
+      window.localStorage.setItem(DRAFT_KEY, JSON.stringify(answers));
     } catch {
       /* storage may be unavailable or full */
     }
   }, [answers, loaded]);
+
+  useEffect(() => {
+    if (!loaded) return;
+    try {
+      window.localStorage.setItem(STEP_KEY, String(step));
+    } catch {
+      /* storage may be unavailable */
+    }
+  }, [step, loaded]);
 
   // Load the PDF renderer on arrival at the last step rather than on click.
   // Sharing has to open the share sheet inside the click that asked for it,
